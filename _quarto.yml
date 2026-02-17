@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Irish Gender Earnings Gap"
+  sidebar:
+    tools:
+      - icon: github
+        href: https://github.com/thisizaq
+
+format:
+  closeread-html:
+    css: usj.css
+    fig-format: svg
+    cr-section:
+      layout: sidebar-left
+      linkcolor: tomato

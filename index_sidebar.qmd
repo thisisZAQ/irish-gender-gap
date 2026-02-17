@@ -1,0 +1,301 @@
+---
+title: "Exploring the Irish Gender Earnings Gap Story"
+author: Zahra
+subtitle: "Exploring the earning gaps via storytelling"
+link-external-newwindow: true
+lang: en
+editor:
+  markdown:
+    wrap: sentence
+---
+
+#  {.page-columns .page-full}
+
+## How unequal are annual earnings between men and women?
+
+In 2024, administrative payroll data provides a near-complete picture of annual earnings in Ireland.Unlike survey data, these figures are derived directly from employer tax records.
+
+This is not a sample.
+It is the observed structure of the labour market.
+Today we examine one question: How unequal are annual earnings between men and women?
+
+## A brief history of council housing in Vienna
+
+Vienna is a city of renters with a homeownership rate as low as 20%.
+Today, roughly 220,000 dwellings or 25% of all residential dwellings in Vienna are owned by the municipality (*Gemeindebau*), making the city one of the largest real estate owners in Europe [@hatz:2008].
+Taking another 15% or almost 150,000 dwellings owned by non-profit housing associations (*Gemeinnützige Bauvereinigungen*) into account, the share of social housing rises to 40%.
+
+\
+
+::: {.column-screen style="background-image:url(https://mschnetzer.github.io/img/scrollytell/kmh-plan.jpg); background-size: 100vw; height: 250px; background-position: center +0%; background-repeat: no-repeat;"}
+:::
+
+<figcaption>Plan of [Karl-Marx-Hof](https://en.wikipedia.org/wiki/Karl-Marx-Hof), built between 1927 and 1930 by city planner Karl Ehn.
+Source: [Vielfalt der Moderne](https://vielfaltdermoderne.de/karl-marx-hof/)</figcaption>
+
+\
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+# ============================
+# Libraries & Data
+# ============================
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(dplyr)
+
+earnings <- read_csv("DEA04.20260131T170118.csv")
+earnings <- earnings %>%
+  filter(age != "15 years and over")
+```
+
+:::: {.cr-section layout="sidebar-left"}
+::: {#cr-avgearnings}
+```{r avgearnings}
+#| warning: false
+#| fig-width: 9.5 
+df_2024 <- earnings |>
+  filter(year == 2024, statistic == 'Mean Annual Earnings')
+
+# Reorder age groups properly
+df_2024$age <- factor(df_2024$age, 
+                             levels = c('15 - 24 years',
+                                        '25 - 29 years', 
+                                        '30 - 39 years', 
+                                        '40 - 49 years', 
+                                        '50 - 59 years', 
+                                        '60 years and over'))
+
+# Create the grouped bar chart
+p <- ggplot(df_2024, aes(x = age, y = value, fill = sex)) +
+  geom_bar(stat = 'identity', position = position_dodge(width = 0.8), 
+           width = 0.7, alpha = 0.8) +
+  geom_text(aes(label = paste0('€', format(value, big.mark = ',', scientific = FALSE))),
+            position = position_dodge(width = 0.8),
+            vjust = -0.5, size = 3) +
+  scale_fill_manual(values = c('Male' = '#3498db', 'Female' = '#e74c3c')) +
+  scale_y_continuous(labels = label_number(prefix = '€', suffix = 'k', scale = 1e-3),
+                     expand = expansion(mult = c(0, 0.15))) +
+  labs(title = 'Average Annual Earnings by Age Group and Gender - 2024',
+       x = 'Age Group' ,
+       y = 'Average Annual Earnings (€)',
+       fill = 'Gender') +
+  theme_minimal() 
+print(p)
+
+```
+:::
+
+**Life-Cycle Earnings Profiles** : Administrative payroll data from the Central Statistics Office indicate that mean annual earnings increase with age for both men and women, peaking between ages 40–49.However, gender differences are observable at every stage.
+Two empirical patterns emerge: 1) Earnings follow a standard life-cycle profile (Mincer-type trajectory).
+2) The gender gap widens markedly after age 30.
+@cr-avgearnings
+
+::: {#cr-avgearningspost30}
+```{r avgearningspost30}
+#| warning: false
+#| fig-width: 9.5 
+df_2024 <- earnings |>
+  filter(year == 2024, statistic == 'Mean Annual Earnings')
+
+# Reorder age groups properly
+df_2024$age <- factor(df_2024$age, 
+                             levels = c('15 - 24 years', 
+                                        '25 - 29 years', 
+                                        '30 - 39 years', 
+                                        '40 - 49 years', 
+                                        '50 - 59 years', 
+                                        '60 years and over'))
+
+# Create the grouped bar chart
+p <- ggplot(df_2024, aes(x = age, y = value, fill = sex)) +
+  geom_bar(stat = 'identity', position = position_dodge(width = 0.8), 
+           width = 0.7, alpha = 0.8) +
+  geom_text(aes(label = paste0('€', format(value, big.mark = ',', scientific = FALSE))),
+            position = position_dodge(width = 0.8),
+            vjust = -0.5, size = 3) +
+  scale_fill_manual(values = c('Male' = '#3498db', 'Female' = '#e74c3c')) +
+  scale_y_continuous(labels = label_number(prefix = '€', suffix = 'k', scale = 1e-3),
+                     expand = expansion(mult = c(0, 0.15))) +
+  labs(title = 'Average Annual Earnings by Age Group and Gender - 2024',
+       x = 'Age Group' ,
+       y = 'Average Annual Earnings (€)',
+       fill = 'Gender') +
+  theme_minimal() 
+print(p)
+
+```
+::::
+
+**Expansion of the Gender Differential** : The absolute earnings gap widens markedly after age 30.
+The divergence is not linear; it accelerates during mid-career stages.
+International evidence from the OECD indicates that gender wage gaps frequently expand after early career stages, particularly in economies with high returns to seniority and occupational progression (OECD, 2023).
+@cr-avgearningspost30
+
+::: {#cr-earninggap}
+```{r earninggap}
+#| warning: false
+#| fig-width: 9.5 
+gap_df <- earnings %>%
+  filter(year == 2024, statistic == "Mean Annual Earnings") %>%
+  pivot_wider(
+    names_from = sex,
+    values_from = value
+  ) %>%
+  mutate(
+    gap_pct = ((Male - Female) / Male) * 100,
+    gap_pct = round(gap_pct, 1)
+  )
+latest_year <- 2024  # or your dynamic year object
+
+ggplot(gap_df, aes(x = gap_pct, y = age)) +
+  geom_col(fill = "#e74c3c") +
+  geom_text(aes(label = paste0(gap_pct, "%")),
+            hjust = -0.1,
+            size = 4) +
+  labs(
+    title = paste0("Gender Earnings Gap by Age Group, Ireland (", latest_year, ")"),
+    x = "Gender Earnings Gap (%)",
+    y = "Age Group"
+  ) +
+  scale_x_continuous(
+    labels = function(x) paste0(x, "%"),
+    expand = expansion(mult = c(0, 0.1))
+  ) +
+  theme_minimal(base_size = 13)
+```
+::::
+**Gender Earnings Gap by Age Group (%)** : The Gap Narrows Briefly, Then
+Expands.The smallest proportional gap appears at ages 25–29 (.9%).
+However, this narrowing is temporary.From age 30 onward, the gap widens consistently across every cohort.
+The data shows a clear inflection point between early career and mid-career progression.
+@cr-earninggap
+
+::: {#cr-medianearnings}
+```{r medianearnings}
+#| warning: false
+#| fig-width: 9.5 
+df_2024 <- earnings |>
+  filter(year == 2024, statistic == 'Median Annual Earnings')
+
+# Reorder age groups properly
+df_2024$age <- factor(df_2024$age, 
+                             levels = c('15 - 24 years', 
+                                        '25 - 29 years', 
+                                        '30 - 39 years', 
+                                        '40 - 49 years', 
+                                        '50 - 59 years', 
+                                        '60 years and over'))
+
+# Create the grouped bar chart
+p <- ggplot(df_2024, aes(x = age, y = value, fill = sex)) +
+  geom_bar(stat = 'identity', position = position_dodge(width = 0.8), 
+           width = 0.7, alpha = 0.8) +
+  geom_text(aes(label = paste0('€', format(value, big.mark = ',', scientific = FALSE))),
+            position = position_dodge(width = 0.8),
+            vjust = -0.5, size = 3) +
+  scale_fill_manual(values = c('Male' = '#3498db', 'Female' = '#e74c3c')) +
+  scale_y_continuous(labels = label_number(prefix = '€', suffix = 'k', scale = 1e-3),
+                     expand = expansion(mult = c(0, 0.15))) +
+  labs(title = 'Median Annual Earnings by Age Group and Gender - 2024',
+       x = 'Age Group' ,
+       y = 'Median Annual Earnings (€)',
+       fill = 'Gender') +
+  theme_minimal() 
+print(p)
+
+```
+::::
+
+**Means can be misleading ** Does the pattern still hold up when we compare medians rather than means? @cr-medianearnings
+
+::: {#cr-meanmedian}
+```{r meanmedian}
+#| warning: false
+#| fig-width: 9.5 
+gap_df <- earnings %>%
+  filter(year == 2024,
+         statistic %in% c("Mean Annual Earnings",
+                          "Median Annual Earnings")) %>%
+  pivot_wider(names_from = statistic,
+              values_from = value) %>%
+  mutate(
+    mean_median_gap = `Mean Annual Earnings` -
+                      `Median Annual Earnings`
+  )
+
+ggplot(gap_df,
+       aes(x = age,
+           y = mean_median_gap,
+           colour = sex,
+           group = sex)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Mean–Median Earnings Gap (Indicator of Earnings Dispersion)",
+    x = "Age Group",
+    y = "Mean – Median (€)"
+  ) +
+  theme_minimal(base_size = 13)
+
+
+```
+:::
+**Indicator of Earnings Dispersion : ** The mean–median gap measures how far the average earnings exceed the midpoint of the distribution.The median represents the typical earner — 50% earn above it, 50% below.The mean is pulled upward by very high earners.When the mean is higher than the median, the distribution is right-skewed — meaning a smaller group of high earners raises the overall average.
+In this chart, the gap widens steadily with age:For men, it increases from roughly €1,000 (15–24) to nearly €17,000–€18,000 (50–59).For women, it rises from about €1,500 to roughly €10,000 in mid-to-late career.This widening gap indicates that earnings dispersion grows over the life cycle — particularly at the top of the distribution. @cr-meanmedian
+
+::: {#cr-employment}
+```{r employment}
+#| warning: false
+#| fig-width: 9.5 
+employment_df <- earnings %>%
+  filter(year == 2024,
+         statistic == "Percentage of Employments") %>%  
+  mutate(
+    sex = trimws(sex),
+    age = factor(
+      age,
+      levels = c("15 - 24 years",
+                 "25 - 29 years",
+                 "30 - 39 years",
+                 "40 - 49 years",
+                 "50 - 59 years",
+                 "60 years and over")))
+ggplot(employment_df,
+       aes(x = age,
+           y = value,
+           colour = sex,
+           group = sex)) +
+
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+
+  labs(
+    title = "Employment Rate by Age and Gender, Ireland (2024)",
+    x = "Age Group",
+    y = "Employment Rate (%)",
+    colour = "Gender"
+  ) +
+
+  scale_y_continuous(
+    limits = c(0, 100),
+    labels = function(x) paste0(x, "%")
+  ) +
+
+  theme_minimal(base_size = 13)
+
+
+```
+::: 
+**Employment Rate:** Employment rates are nearly identical across genders in 2024, remaining within a narrow 49–52% range across all age groups. This aligns with data from the Central Statistics Office, which shows strong and converging labour force participation in recent years. A small divergence appears in the 25–39 age group, where male employment slightly exceeds female employment — a pattern consistent with findings from the OECD that participation gaps tend to widen temporarily during child-rearing years. However, from ages 40–59, employment rates converge again.   
+@cr-employment
+
+:::: 
+
+## Conclusion
+
+The gender earnings gap widens steadily over the life cycle, rising from 12.3% in early career to 30.9% by age 60+. While the gap is modest at labour market entry, it expands sharply from age 30 onward, peaking in later career stages.Since employment percentages are broadly similar across genders, this widening gap cannot be explained by participation alone. Instead, the pattern suggests cumulative effects linked to career progression, seniority, sectoral distribution, and wage dispersion over time.
