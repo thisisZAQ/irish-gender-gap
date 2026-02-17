@@ -19,14 +19,6 @@ This is not a sample.
 It is the observed structure of the labour market.
 Today we examine one question: How unequal are annual earnings between men and women?
 
-## A brief history of council housing in Vienna
-
-Vienna is a city of renters with a homeownership rate as low as 20%.
-Today, roughly 220,000 dwellings or 25% of all residential dwellings in Vienna are owned by the municipality (*Gemeindebau*), making the city one of the largest real estate owners in Europe [@hatz:2008].
-Taking another 15% or almost 150,000 dwellings owned by non-profit housing associations (*Gemeinnützige Bauvereinigungen*) into account, the share of social housing rises to 40%.
-
-\
-
 ::: {.column-screen style="background-image:url(https://mschnetzer.github.io/img/scrollytell/kmh-plan.jpg); background-size: 100vw; height: 250px; background-position: center +0%; background-repeat: no-repeat;"}
 :::
 
