@@ -19,11 +19,8 @@ This is not a sample.
 It is the observed structure of the labour market.
 Today we examine one question: How unequal are annual earnings between men and women?
 
-::: {.column-screen style="background-image:url(https://mschnetzer.github.io/img/scrollytell/kmh-plan.jpg); background-size: 100vw; height: 250px; background-position: center +0%; background-repeat: no-repeat;"}
+::: {.column-screen style="background-image:url(https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Walter_Osborne_In_a_Dublin_Park%2C_Light_and_Shade.jpg/1920px-Walter_Osborne_In_a_Dublin_Park%2C_Light_and_Shade.jpg); background-size: 100vw; height: 250px; background-position: center +0%; background-repeat: no-repeat;"}
 :::
-
-<figcaption>Plan of [Karl-Marx-Hof](https://en.wikipedia.org/wiki/Karl-Marx-Hof), built between 1927 and 1930 by city planner Karl Ehn.
-Source: [Vielfalt der Moderne](https://vielfaltdermoderne.de/karl-marx-hof/)</figcaption>
 
 \
 
