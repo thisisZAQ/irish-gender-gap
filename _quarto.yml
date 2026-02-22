@@ -1,5 +1,7 @@
+
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "Irish Gender Earnings Gap"
@@ -7,7 +9,7 @@ website:
     tools:
       - icon: github
         href: https://github.com/thisizaq
-output-dir: docs
+
 
 
 format:
